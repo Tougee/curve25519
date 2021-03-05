@@ -1,8 +1,4 @@
-Dart port of [Curve25519](https://github.com/golang/crypto/tree/master/curve25519)
-
-Usage
-```dart
-
+import 'package:hex/hex.dart';
 import 'package:curve25519/curve25519.dart' as curve;
 
 void useX25519() {
@@ -16,4 +12,3 @@ void useX25519() {
   }
   assert(HEX.encode(x) == expectedHex);
 }
-```
