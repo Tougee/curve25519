@@ -1,12 +1,12 @@
 /// Package curve25519 provides an implementation of the X25519 function, which
 /// performs scalar multiplication on the elliptic curve known as Curve25519.
 /// See RFC 7748.
-library curve25519;
+library x25519;
 
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:curve25519/src/curve25519_internal.dart' as curve;
+import 'package:x25519/src/curve25519.dart' as curve;
 
 /// ScalarSize is the size of the scalar input to X25519.
 const ScalarSize = 32;

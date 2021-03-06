@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:curve25519/curve25519.dart';
+import 'package:x25519/x25519.dart';
 import 'package:test/test.dart';
 import 'package:hex/hex.dart';
 

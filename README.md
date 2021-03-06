@@ -3,7 +3,7 @@ Dart port of [Curve25519](https://github.com/golang/crypto/tree/master/curve2551
 Usage
 ```dart
 
-import 'package:curve25519/curve25519.dart' as curve;
+import 'package:x25519/x25519.dart';
 
 void useX25519() {
   const expectedHex =
@@ -12,7 +12,7 @@ void useX25519() {
   x[0] = 1;
 
   for (var i = 0; i < 200; i++) {
-    x = curve.X25519(x, curve.basePoint);
+    x = X25519(x, basePoint);
   }
   assert(HEX.encode(x) == expectedHex);
 }
