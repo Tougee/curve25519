@@ -1,6 +1,6 @@
 name: x25519
-description: Dart port of curve25519
-version: 0.0.1
+description: Dart port of x25519 from Go Cryptography curve25519.
+version: 0.0.2
 homepage: https://github.com/Tougee/curve25519
 
 environment:

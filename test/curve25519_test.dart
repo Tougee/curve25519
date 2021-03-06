@@ -46,4 +46,14 @@ void main() {
       assert(ListEquality().equals(got, item.expect));
     }
   });
+
+  test('testGenKeyAndX25519', () {
+    var aliceKeyPair = generateKeyPair();
+    var bobKeyPair = generateKeyPair();
+
+    var aliceSharedKey = X25519(aliceKeyPair.privateKey, bobKeyPair.publicKey);
+    var bobSharedKey = X25519(bobKeyPair.privateKey, aliceKeyPair.publicKey);
+
+    assert(ListEquality().equals(aliceSharedKey, bobSharedKey));
+  });
 }

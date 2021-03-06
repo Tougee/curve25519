@@ -3,6 +3,7 @@
 /// See RFC 7748.
 library x25519;
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -13,6 +14,40 @@ const ScalarSize = 32;
 
 /// PointSize is the size of the point input to X25519.
 const PointSize = 32;
+
+final _random = Random.secure();
+
+/// KeyPair is the type of Curve25519 public/private key pair.
+class KeyPair {
+  final List<int> privateKey;
+
+  final List<int> publicKey;
+
+  KeyPair({required this.privateKey, required this.publicKey});
+
+  @override
+  int get hashCode => publicKey.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is KeyPair &&
+      publicKey == other.publicKey &&
+      privateKey == other.privateKey;
+}
+
+/// GenerateKey generates a public/private key pair using entropy from secure random.
+KeyPair generateKeyPair() {
+  var private = List<int>.generate(ScalarSize, (i) => _random.nextInt(256));
+  var public = List<int>.filled(32, 0);
+
+  private[0] &= 248;
+  private[31] &= 127;
+  private[31] |= 64;
+
+  ScalarBaseMult(public, private);
+
+  return KeyPair(privateKey: private, publicKey: Uint8List.fromList(public));
+}
 
 /// ScalarMult sets dst to the product scalar * point.
 ///
