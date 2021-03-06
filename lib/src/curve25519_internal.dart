@@ -71,7 +71,7 @@ void FeCopy(FieldElement dst, FieldElement src) {
 // feCSwap replaces (f,g) with (g,f) if b == 1; replaces (f,g) with (f,g) if b == 0.
 //
 // Preconditions: b in {0,1}.
-void feCSwap(FieldElement f, g, int b) {
+void feCSwap(FieldElement f, FieldElement g, int b) {
   b = -b;
   for (var i = 0; i < f.length; i++) {
     var t = b & (f[i] ^ g[i]);
@@ -295,7 +295,7 @@ void FeToBytes(List<int> s, FieldElement h) {
 /// Can get away with 11 carries, but then data flow is much deeper.
 ///
 /// With tighter constraints on inputs can squeeze carries into int32.
-void feMul(FieldElement h, f, g) {
+void feMul(FieldElement h, FieldElement f, FieldElement g) {
   var f0 = f[0];
   var f1 = f[1];
   var f2 = f[2];
@@ -607,17 +607,17 @@ void feMul(FieldElement h, f, g) {
 ///
 /// Postconditions:
 ///    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-void feSquare(FieldElement h, f) {
-  var f0 = f[0]!;
-  var f1 = f[1]!;
-  var f2 = f[2]!;
-  var f3 = f[3]!;
-  var f4 = f[4]!;
-  var f5 = f[5]!;
-  var f6 = f[6]!;
-  var f7 = f[7]!;
-  var f8 = f[8]!;
-  var f9 = f[9]!;
+void feSquare(FieldElement h, FieldElement f) {
+  var f0 = f[0];
+  var f1 = f[1];
+  var f2 = f[2];
+  var f3 = f[3];
+  var f4 = f[4];
+  var f5 = f[5];
+  var f6 = f[6];
+  var f7 = f[7];
+  var f8 = f[8];
+  var f9 = f[9];
   var f0_2 = 2 * f0;
   var f1_2 = 2 * f1;
   var f2_2 = 2 * f2;
@@ -687,16 +687,16 @@ void feSquare(FieldElement h, f) {
   var f8f9_38 = f8 * f9_38;
   var f9f9_38 = f9 * f9_38;
   var h0 = f0f0 + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38;
-  dynamic h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
-  dynamic h2 = f0f2_2 + f1f1_2 + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
-  dynamic h3 = f0f3_2 + f1f2_2 + f4f9_38 + f5f8_38 + f6f7_38;
-  dynamic h4 = f0f4_2 + f1f3_4 + f2f2 + f5f9_76 + f6f8_38 + f7f7_38;
-  dynamic h5 = f0f5_2 + f1f4_2 + f2f3_2 + f6f9_38 + f7f8_38;
-  dynamic h6 = f0f6_2 + f1f5_4 + f2f4_2 + f3f3_2 + f7f9_76 + f8f8_19;
-  dynamic h7 = f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38;
-  dynamic h8 = f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38;
-  dynamic h9 = f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2;
-  dynamic carry = List<int>.filled(10, 0);
+  var h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
+  var h2 = f0f2_2 + f1f1_2 + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
+  var h3 = f0f3_2 + f1f2_2 + f4f9_38 + f5f8_38 + f6f7_38;
+  var h4 = f0f4_2 + f1f3_4 + f2f2 + f5f9_76 + f6f8_38 + f7f7_38;
+  var h5 = f0f5_2 + f1f4_2 + f2f3_2 + f6f9_38 + f7f8_38;
+  var h6 = f0f6_2 + f1f5_4 + f2f4_2 + f3f3_2 + f7f9_76 + f8f8_19;
+  var h7 = f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38;
+  var h8 = f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38;
+  var h9 = f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2;
+  var carry = List<int>.filled(10, 0);
 
   carry[0] = (h0 + (1 << 25)) >> 26;
   h1 += carry[0];
@@ -760,7 +760,7 @@ void feSquare(FieldElement h, f) {
 ///
 /// Postconditions:
 ///    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-void feMul121666(FieldElement h, f) {
+void feMul121666(FieldElement h, FieldElement f) {
   var h0 = f[0] * 121666;
   var h1 = f[1] * 121666;
   var h2 = f[2] * 121666;
@@ -771,7 +771,7 @@ void feMul121666(FieldElement h, f) {
   var h7 = f[7] * 121666;
   var h8 = f[8] * 121666;
   var h9 = f[9] * 121666;
-  dynamic carry = List<int>.filled(10, 0);
+  var carry = List<int>.filled(10, 0);
 
   carry[9] = (h9 + (1 << 24)) >> 25;
   h0 += carry[9] * 19;
@@ -818,7 +818,7 @@ void feMul121666(FieldElement h, f) {
 }
 
 /// feInvert sets out = z^-1.
-void feInvert(FieldElement out, z) {
+void feInvert(FieldElement out, FieldElement z) {
   var t0 = FieldElement();
   var t1 = FieldElement();
   var t2 = FieldElement();
@@ -882,7 +882,7 @@ void feInvert(FieldElement out, z) {
   feMul(out, t1, t0);
 }
 
-void scalarMultGeneric(List<int> out, input, base) {
+void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
   var e = List<int>.filled(32, 0);
 
   e.setRange(0, e.length, input);
