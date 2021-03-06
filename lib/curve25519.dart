@@ -19,7 +19,7 @@ const PointSize = 32;
 /// Deprecated: when provided a low-order point, ScalarMult will set dst to all
 /// zeroes, irrespective of the scalar. Instead, use the X25519 function, which
 /// will return an error.
-void ScalarMult(List<int> dst, scalar, point) {
+void ScalarMult(List<int> dst, List<int> scalar, List<int> point) {
   curve.scalarMultGeneric(dst, scalar, point);
 }
 
@@ -28,7 +28,7 @@ void ScalarMult(List<int> dst, scalar, point) {
 ///
 /// It is recommended to use the X25519 function with Basepoint instead, as
 /// copying into fixed size arrays can lead to unexpected bugs.
-void ScalarBaseMult(List<int> dst, scalar) {
+void ScalarBaseMult(List<int> dst, List<int> scalar) {
   curve.scalarMultGeneric(dst, scalar, basePoint);
 }
 

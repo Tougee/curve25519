@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:collection/collection.dart';
 import 'package:curve25519/curve25519.dart';
 import 'package:test/test.dart';
@@ -31,6 +33,13 @@ void main() {
   });
 
   test('testTestVectors', () {
+    for (var i = 0; i < testVectors.length; i++) {
+      var item = testVectors[i];
+      var got = List<int>.filled(ScalarSize, 0);
+      ScalarMult(got, item.input, item.base);
+      assert(ListEquality().equals(Uint8List.fromList(got), item.expect));
+    }
+
     for (var i = 0; i < testVectors.length; i++) {
       var item = testVectors[i];
       var got = X25519(item.input, item.base);
