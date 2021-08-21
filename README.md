@@ -1,5 +1,7 @@
 Dart port of [Curve25519](https://github.com/golang/crypto/tree/master/curve25519)
 
+[Pub package](https://pub.dev/packages/x25519)
+
 Usage
 ```dart
 
