@@ -16,6 +16,9 @@ class FieldElement {
   }
 
   int get length => innerList.length;
+
+  @override
+  String toString() => innerList.toString();
 }
 
 void fieldElementCopy(
@@ -72,30 +75,30 @@ void FeCopy(FieldElement dst, FieldElement src) {
 //
 // Preconditions: b in {0,1}.
 void feCSwap(FieldElement f, FieldElement g, int b) {
-  b = -b;
+  var bb = BigInt.from(-b);
   for (var i = 0; i < f.length; i++) {
-    var t = b & (f[i] ^ g[i]);
-    f[i] ^= t;
-    g[i] ^= t;
+    var fi = BigInt.from(f[i]);
+    var gi = BigInt.from(g[i]);
+    var t = bb & (fi ^ gi);
+    f[i] = (fi ^ t).toInt();
+    g[i] = (gi ^ t).toInt();
   }
 }
 
-// load3 reads a 24-bit, little-endian value from in.
-int load3(List<int> input) {
-  var r;
-  r = input[0];
-  r |= input[1] << 8;
-  r |= input[2] << 16;
+BigInt load3(List<int> input) {
+  BigInt r;
+  r = BigInt.from(input[0]);
+  r |= BigInt.from(input[1] << 8);
+  r |= BigInt.from(input[2] << 16);
   return r;
 }
 
-// load4 reads a 32-bit, little-endian value from in.
-int load4(List<int> input) {
-  int r;
-  r = input[0];
-  r |= input[1] << 8;
-  r |= input[2] << 16;
-  r |= input[3] << 24;
+BigInt load4(List<int> input) {
+  BigInt r;
+  r = BigInt.from(input[0]);
+  r |= BigInt.from(input[1] << 8);
+  r |= BigInt.from(input[2] << 16);
+  r |= BigInt.from(input[3] << 24);
   return r;
 }
 
@@ -109,51 +112,51 @@ void feFromBytes(FieldElement dst, List<int> src) {
   var h6 = load3(src.sublist(20, src.length)) << 7;
   var h7 = load3(src.sublist(23, src.length)) << 5;
   var h8 = load3(src.sublist(26, src.length)) << 4;
-  var h9 = (load3(src.sublist(29, src.length)) & 0x7fffff) << 2;
+  var h9 = (load3(src.sublist(29, src.length)) & BigInt.from(0x7fffff)) << 2;
 
   var carry = List<int>.filled(10, 0);
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
-  h9 -= carry[9] << 25;
-  carry[1] = (h1 + (1 << 24)) >> 25;
-  h2 += carry[1];
-  h1 -= carry[1] << 25;
-  carry[3] = (h3 + (1 << 24)) >> 25;
-  h4 += carry[3];
-  h3 -= carry[3] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
-  h6 += carry[5];
-  h5 -= carry[5] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
-  h8 += carry[7];
-  h7 -= carry[7] << 25;
+  carry[9] = ((h9 + BigInt.from(1 << 24)) >> 25).toInt();
+  h0 += BigInt.from(carry[9] * 19);
+  h9 -= BigInt.from(carry[9]) << 25;
+  carry[1] = ((h1 + BigInt.from(1 << 24)) >> 25).toInt();
+  h2 += BigInt.from(carry[1]);
+  h1 -= BigInt.from(carry[1]) << 25;
+  carry[3] = ((h3 + BigInt.from(1 << 24)) >> 25).toInt();
+  h4 += BigInt.from(carry[3]);
+  h3 -= BigInt.from(carry[3]) << 25;
+  carry[5] = ((h5 + BigInt.from(1 << 24)) >> 25).toInt();
+  h6 += BigInt.from(carry[5]);
+  h5 -= BigInt.from(carry[5]) << 25;
+  carry[7] = ((h7 + BigInt.from(1 << 24)) >> 25).toInt();
+  h8 += BigInt.from(carry[7]);
+  h7 -= BigInt.from(carry[7]) << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
-  h1 += carry[0];
-  h0 -= carry[0] << 26;
-  carry[2] = (h2 + (1 << 25)) >> 26;
-  h3 += carry[2];
-  h2 -= carry[2] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
-  h5 += carry[4];
-  h4 -= carry[4] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
-  h7 += carry[6];
-  h6 -= carry[6] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
-  h9 += carry[8];
-  h8 -= carry[8] << 26;
+  carry[0] = ((h0 + BigInt.from(1 << 25)) >> 26).toInt();
+  h1 += BigInt.from(carry[0]);
+  h0 -= BigInt.from(carry[0]) << 26;
+  carry[2] = ((h2 + BigInt.from(1 << 25)) >> 26).toInt();
+  h3 += BigInt.from(carry[2]);
+  h2 -= BigInt.from(carry[2]) << 26;
+  carry[4] = ((h4 + BigInt.from(1 << 25)) >> 26).toInt();
+  h5 += BigInt.from(carry[4]);
+  h4 -= BigInt.from(carry[4]) << 26;
+  carry[6] = ((h6 + BigInt.from(1 << 25)) >> 26).toInt();
+  h7 += BigInt.from(carry[6]);
+  h6 -= BigInt.from(carry[6]) << 26;
+  carry[8] = ((h8 + BigInt.from(1 << 25)) >> 26).toInt();
+  h9 += BigInt.from(carry[8]);
+  h8 -= BigInt.from(carry[8]) << 26;
 
-  dst[0] = h0;
-  dst[1] = h1;
-  dst[2] = h2;
-  dst[3] = h3;
-  dst[4] = h4;
-  dst[5] = h5;
-  dst[6] = h6;
-  dst[7] = h7;
-  dst[8] = h8;
-  dst[9] = h9;
+  dst[0] = h0.toInt();
+  dst[1] = h1.toInt();
+  dst[2] = h2.toInt();
+  dst[3] = h3.toInt();
+  dst[4] = h4.toInt();
+  dst[5] = h5.toInt();
+  dst[6] = h6.toInt();
+  dst[7] = h7.toInt();
+  dst[8] = h8.toInt();
+  dst[9] = h9.toInt();
 }
 
 /// FeToBytes marshals h to s.
@@ -182,51 +185,51 @@ void feFromBytes(FieldElement dst, List<int> src) {
 void FeToBytes(List<int> s, FieldElement h) {
   var carry = List<int>.filled(10, 0);
 
-  var q = (19 * h[9] + (1 << 24)) >> 25;
-  q = (h[0] + q) >> 26;
-  q = (h[1] + q) >> 25;
-  q = (h[2] + q) >> 26;
-  q = (h[3] + q) >> 25;
-  q = (h[4] + q) >> 26;
-  q = (h[5] + q) >> 25;
-  q = (h[6] + q) >> 26;
-  q = (h[7] + q) >> 25;
-  q = (h[8] + q) >> 26;
-  q = (h[9] + q) >> 25;
+  var q = BigInt.from(19 * h[9] + (1 << 24)) >> 25;
+  q = (BigInt.from(h[0]) + q) >> 26;
+  q = (BigInt.from(h[1]) + q) >> 25;
+  q = (BigInt.from(h[2]) + q) >> 26;
+  q = (BigInt.from(h[3]) + q) >> 25;
+  q = (BigInt.from(h[4]) + q) >> 26;
+  q = (BigInt.from(h[5]) + q) >> 25;
+  q = (BigInt.from(h[6]) + q) >> 26;
+  q = (BigInt.from(h[7]) + q) >> 25;
+  q = (BigInt.from(h[8]) + q) >> 26;
+  q = (BigInt.from(h[9]) + q) >> 25;
 
   // Goal: Output h-(2^255-19)q, which is between 0 and 2^255-20.
-  h[0] += 19 * q;
+  h[0] += (BigInt.from(19) * q).toInt();
   // Goal: Output h-2^255 q, which is between 0 and 2^255-20.
 
-  carry[0] = h[0] >> 26;
+  carry[0] = (BigInt.from(h[0]) >> 26).toInt();
   h[1] += carry[0];
-  h[0] -= carry[0] << 26;
-  carry[1] = h[1] >> 25;
+  h[0] -= (BigInt.from(carry[0]) << 26).toInt();
+  carry[1] = (BigInt.from(h[1]) >> 25).toInt();
   h[2] += carry[1];
-  h[1] -= carry[1] << 25;
-  carry[2] = h[2] >> 26;
+  h[1] -= (BigInt.from(carry[1]) << 25).toInt();
+  carry[2] = (BigInt.from(h[2]) >> 26).toInt();
   h[3] += carry[2];
-  h[2] -= carry[2] << 26;
-  carry[3] = h[3] >> 25;
+  h[2] -= (BigInt.from(carry[2]) << 26).toInt();
+  carry[3] = (BigInt.from(h[3]) >> 25).toInt();
   h[4] += carry[3];
-  h[3] -= carry[3] << 25;
-  carry[4] = h[4] >> 26;
+  h[3] -= (BigInt.from(carry[3]) << 25).toInt();
+  carry[4] = (BigInt.from(h[4]) >> 26).toInt();
   h[5] += carry[4];
-  h[4] -= carry[4] << 26;
-  carry[5] = h[5] >> 25;
+  h[4] -= (BigInt.from(carry[4]) << 26).toInt();
+  carry[5] = (BigInt.from(h[5]) >> 25).toInt();
   h[6] += carry[5];
-  h[5] -= carry[5] << 25;
-  carry[6] = h[6] >> 26;
+  h[5] -= (BigInt.from(carry[5]) << 25).toInt();
+  carry[6] = (BigInt.from(h[6]) >> 26).toInt();
   h[7] += carry[6];
-  h[6] -= carry[6] << 26;
-  carry[7] = h[7] >> 25;
+  h[6] -= (BigInt.from(carry[6]) << 26).toInt();
+  carry[7] = (BigInt.from(h[7]) >> 25).toInt();
   h[8] += carry[7];
-  h[7] -= carry[7] << 25;
-  carry[8] = h[8] >> 26;
+  h[7] -= (BigInt.from(carry[7]) << 25).toInt();
+  carry[8] = (BigInt.from(h[8]) >> 26).toInt();
   h[9] += carry[8];
-  h[8] -= carry[8] << 26;
-  carry[9] = h[9] >> 25;
-  h[9] -= carry[9] << 25;
+  h[8] -= (BigInt.from(carry[8]) << 26).toInt();
+  carry[9] = (BigInt.from(h[9]) >> 25).toInt();
+  h[9] -= (BigInt.from(carry[9]) << 25).toInt();
   // h10 = carry9
 
   // Goal: Output h[0]+...+2^255 h10-2^255 q, which is between 0 and 2^255-20.
@@ -296,40 +299,77 @@ void FeToBytes(List<int> s, FieldElement h) {
 ///
 /// With tighter constraints on inputs can squeeze carries into int32.
 void feMul(FieldElement h, FieldElement f, FieldElement g) {
-  var f0 = f[0];
-  var f1 = f[1];
-  var f2 = f[2];
-  var f3 = f[3];
-  var f4 = f[4];
-  var f5 = f[5];
-  var f6 = f[6];
-  var f7 = f[7];
-  var f8 = f[8];
-  var f9 = f[9];
-  var g0 = g[0];
-  var g1 = g[1];
-  var g2 = g[2];
-  var g3 = g[3];
-  var g4 = g[4];
-  var g5 = g[5];
-  var g6 = g[6];
-  var g7 = g[7];
-  var g8 = g[8];
-  var g9 = g[9];
-  var g1_19 = 19 * g[1]; /* 1.4*2^29 */
-  var g2_19 = 19 * g[2]; /* 1.4*2^30; still ok */
-  var g3_19 = 19 * g[3];
-  var g4_19 = 19 * g[4];
-  var g5_19 = 19 * g[5];
-  var g6_19 = 19 * g[6];
-  var g7_19 = 19 * g[7];
-  var g8_19 = 19 * g[8];
-  var g9_19 = 19 * g[9];
-  var f1_2 = 2 * f[1];
-  var f3_2 = 2 * f[3];
-  var f5_2 = 2 * f[5];
-  var f7_2 = 2 * f[7];
-  var f9_2 = 2 * f[9];
+  var f0 = BigInt.from(f[0]);
+  var f1 = BigInt.from(f[1]);
+  var f2 = BigInt.from(f[2]);
+  var f3 = BigInt.from(f[3]);
+  var f4 = BigInt.from(f[4]);
+  var f5 = BigInt.from(f[5]);
+  var f6 = BigInt.from(f[6]);
+  var f7 = BigInt.from(f[7]);
+  var f8 = BigInt.from(f[8]);
+  var f9 = BigInt.from(f[9]);
+
+  var f1_2 = BigInt.from(2 * f[1]);
+  var f3_2 = BigInt.from(2 * f[3]);
+  var f5_2 = BigInt.from(2 * f[5]);
+  var f7_2 = BigInt.from(2 * f[7]);
+  var f9_2 = BigInt.from(2 * f[9]);
+
+  var g0 = BigInt.from(g[0]);
+  var g1 = BigInt.from(g[1]);
+  var g2 = BigInt.from(g[2]);
+  var g3 = BigInt.from(g[3]);
+  var g4 = BigInt.from(g[4]);
+  var g5 = BigInt.from(g[5]);
+  var g6 = BigInt.from(g[6]);
+  var g7 = BigInt.from(g[7]);
+  var g8 = BigInt.from(g[8]);
+  var g9 = BigInt.from(g[9]);
+
+  var g1_19 = BigInt.from(19 * g[1]); /* 1.4*2^29 */
+  var g2_19 = BigInt.from(19 * g[2]); /* 1.4*2^30); still ok */
+  var g3_19 = BigInt.from(19 * g[3]);
+  var g4_19 = BigInt.from(19 * g[4]);
+  var g5_19 = BigInt.from(19 * g[5]);
+  var g6_19 = BigInt.from(19 * g[6]);
+  var g7_19 = BigInt.from(19 * g[7]);
+  var g8_19 = BigInt.from(19 * g[8]);
+  var g9_19 = BigInt.from(19 * g[9]);
+  // var f0 = f[0];
+  // var f1 = f[1];
+  // var f2 = f[2];
+  // var f3 = f[3];
+  // var f4 = f[4];
+  // var f5 = f[5];
+  // var f6 = f[6];
+  // var f7 = f[7];
+  // var f8 = f[8];
+  // var f9 = f[9];
+  // var g0 = g[0];
+  // var g1 = g[1];
+  // var g2 = g[2];
+  // var g3 = g[3];
+  // var g4 = g[4];
+  // var g5 = g[5];
+  // var g6 = g[6];
+  // var g7 = g[7];
+  // var g8 = g[8];
+  // var g9 = g[9];
+  // var g1_19 = 19 * g[1]; /* 1.4*2^29 */
+  // var g2_19 = 19 * g[2]; /* 1.4*2^30; still ok */
+  // var g3_19 = 19 * g[3];
+  // var g4_19 = 19 * g[4];
+  // var g5_19 = 19 * g[5];
+  // var g6_19 = 19 * g[6];
+  // var g7_19 = 19 * g[7];
+  // var g8_19 = 19 * g[8];
+  // var g9_19 = 19 * g[9];
+  // var f1_2 = 2 * f[1];
+  // var f3_2 = 2 * f[3];
+  // var f5_2 = 2 * f[5];
+  // var f7_2 = 2 * f[7];
+  // var f9_2 = 2 * f[9];
   var f0g0 = f0 * g0;
   var f0g1 = f0 * g1;
   var f0g2 = f0 * g2;
@@ -514,17 +554,17 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
       f9g9_38;
   var h9 = f0g9 + f1g8 + f2g7 + f3g6 + f4g5 + f5g4 + f6g3 + f7g2 + f8g1 + f9g0;
 
-  var carry = List<int>.filled(10, 0);
+  var carry = List<BigInt>.filled(10, BigInt.zero);
 
 // |h0| <= (1.1*1.1*2^52*(1+19+19+19+19)+1.1*1.1*2^50*(38+38+38+38+38))
 //   i.e. |h0| <= 1.2*2^59; narrower ranges for h2, h4, h6, h8
 // |h1| <= (1.1*1.1*2^51*(1+1+19+19+19+19+19+19+19+19))
 //   i.e. |h1| <= 1.5*2^58; narrower ranges for h3, h5, h7, h9
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + BigInt.from(1 << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + BigInt.from(1 << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
 // |h0| <= 2^25
@@ -532,10 +572,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h1| <= 1.51*2^58
 // |h5| <= 1.51*2^58
 
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + BigInt.from(1 << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + BigInt.from(1 << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
 // |h1| <= 2^24; from now on fits into int32
@@ -543,10 +583,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h2| <= 1.21*2^59
 // |h6| <= 1.21*2^59
 
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + BigInt.from(1 << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + BigInt.from(1 << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
 // |h2| <= 2^25; from now on fits into int32 unchanged
@@ -554,10 +594,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h3| <= 1.51*2^58
 // |h7| <= 1.51*2^58
 
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + BigInt.from(1 << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + BigInt.from(1 << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 // |h3| <= 2^24; from now on fits into int32 unchanged
@@ -565,10 +605,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h4| <= 1.52*2^33
 // |h8| <= 1.52*2^33
 
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + BigInt.from(1 << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + BigInt.from(1 << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 // |h4| <= 2^25; from now on fits into int32 unchanged
@@ -576,28 +616,28 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h5| <= 1.01*2^24
 // |h9| <= 1.51*2^58
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + BigInt.from(1 << 24)) >> 25;
+  h0 += carry[9] * BigInt.from(19);
   h9 -= carry[9] << 25;
 // |h9| <= 2^24; from now on fits into int32 unchanged
 // |h0| <= 1.8*2^37
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + BigInt.from(1 << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
 // |h0| <= 2^25; from now on fits into int32 unchanged
 // |h1| <= 1.01*2^24
 
-  h[0] = h0;
-  h[1] = h1;
-  h[2] = h2;
-  h[3] = h3;
-  h[4] = h4;
-  h[5] = h5;
-  h[6] = h6;
-  h[7] = h7;
-  h[8] = h8;
-  h[9] = h9;
+  h[0] = h0.toInt();
+  h[1] = h1.toInt();
+  h[2] = h2.toInt();
+  h[3] = h3.toInt();
+  h[4] = h4.toInt();
+  h[5] = h5.toInt();
+  h[6] = h6.toInt();
+  h[7] = h7.toInt();
+  h[8] = h8.toInt();
+  h[9] = h9.toInt();
 }
 
 /// feSquare calculates h = f*f. Can overlap h with f.
@@ -608,29 +648,29 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 /// Postconditions:
 ///    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 void feSquare(FieldElement h, FieldElement f) {
-  var f0 = f[0];
-  var f1 = f[1];
-  var f2 = f[2];
-  var f3 = f[3];
-  var f4 = f[4];
-  var f5 = f[5];
-  var f6 = f[6];
-  var f7 = f[7];
-  var f8 = f[8];
-  var f9 = f[9];
-  var f0_2 = 2 * f0;
-  var f1_2 = 2 * f1;
-  var f2_2 = 2 * f2;
-  var f3_2 = 2 * f3;
-  var f4_2 = 2 * f4;
-  var f5_2 = 2 * f5;
-  var f6_2 = 2 * f6;
-  var f7_2 = 2 * f7;
-  var f5_38 = 38 * f5; // 1.31*2^30
-  var f6_19 = 19 * f6; // 1.31*2^30
-  var f7_38 = 38 * f7; // 1.31*2^30
-  var f8_19 = 19 * f8; // 1.31*2^30
-  var f9_38 = 38 * f9; // 1.31*2^30
+  var f0 = BigInt.from(f[0]);
+  var f1 = BigInt.from(f[1]);
+  var f2 = BigInt.from(f[2]);
+  var f3 = BigInt.from(f[3]);
+  var f4 = BigInt.from(f[4]);
+  var f5 = BigInt.from(f[5]);
+  var f6 = BigInt.from(f[6]);
+  var f7 = BigInt.from(f[7]);
+  var f8 = BigInt.from(f[8]);
+  var f9 = BigInt.from(f[9]);
+  var f0_2 = BigInt.from(2) * f0;
+  var f1_2 = BigInt.from(2) * f1;
+  var f2_2 = BigInt.from(2) * f2;
+  var f3_2 = BigInt.from(2) * f3;
+  var f4_2 = BigInt.from(2) * f4;
+  var f5_2 = BigInt.from(2) * f5;
+  var f6_2 = BigInt.from(2) * f6;
+  var f7_2 = BigInt.from(2) * f7;
+  var f5_38 = BigInt.from(38) * f5; // 1.31*2^30
+  var f6_19 = BigInt.from(19) * f6; // 1.31*2^30
+  var f7_38 = BigInt.from(38) * f7; // 1.31*2^30
+  var f8_19 = BigInt.from(19) * f8; // 1.31*2^30
+  var f9_38 = BigInt.from(38) * f9; // 1.31*2^30
   var f0f0 = f0 * f0;
   var f0f1_2 = f0_2 * f1;
   var f0f2_2 = f0_2 * f2;
@@ -696,61 +736,61 @@ void feSquare(FieldElement h, FieldElement f) {
   var h7 = f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38;
   var h8 = f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38;
   var h9 = f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2;
-  var carry = List<int>.filled(10, 0);
+  var carry = List<BigInt>.filled(10, BigInt.zero);
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + BigInt.from(1 << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + BigInt.from(1 << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
 
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + BigInt.from(1 << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + BigInt.from(1 << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
 
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + BigInt.from(1 << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + BigInt.from(1 << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
 
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + BigInt.from(1 << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + BigInt.from(1 << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + BigInt.from(1 << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + BigInt.from(1 << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + BigInt.from(1 << 24)) >> 25;
+  h0 += carry[9] * BigInt.from(19);
   h9 -= carry[9] << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + BigInt.from(1 << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
 
-  h[0] = h0;
-  h[1] = h1;
-  h[2] = h2;
-  h[3] = h3;
-  h[4] = h4;
-  h[5] = h5;
-  h[6] = h6;
-  h[7] = h7;
-  h[8] = h8;
-  h[9] = h9;
+  h[0] = h0.toInt();
+  h[1] = h1.toInt();
+  h[2] = h2.toInt();
+  h[3] = h3.toInt();
+  h[4] = h4.toInt();
+  h[5] = h5.toInt();
+  h[6] = h6.toInt();
+  h[7] = h7.toInt();
+  h[8] = h8.toInt();
+  h[9] = h9.toInt();
 }
 
 /// feMul121666 calculates h = f * 121666. Can overlap h with f.
@@ -761,60 +801,60 @@ void feSquare(FieldElement h, FieldElement f) {
 /// Postconditions:
 ///    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 void feMul121666(FieldElement h, FieldElement f) {
-  var h0 = f[0] * 121666;
-  var h1 = f[1] * 121666;
-  var h2 = f[2] * 121666;
-  var h3 = f[3] * 121666;
-  var h4 = f[4] * 121666;
-  var h5 = f[5] * 121666;
-  var h6 = f[6] * 121666;
-  var h7 = f[7] * 121666;
-  var h8 = f[8] * 121666;
-  var h9 = f[9] * 121666;
-  var carry = List<int>.filled(10, 0);
+  var h0 = BigInt.from(f[0]) * BigInt.from(121666);
+  var h1 = BigInt.from(f[1]) * BigInt.from(121666);
+  var h2 = BigInt.from(f[2]) * BigInt.from(121666);
+  var h3 = BigInt.from(f[3]) * BigInt.from(121666);
+  var h4 = BigInt.from(f[4]) * BigInt.from(121666);
+  var h5 = BigInt.from(f[5]) * BigInt.from(121666);
+  var h6 = BigInt.from(f[6]) * BigInt.from(121666);
+  var h7 = BigInt.from(f[7]) * BigInt.from(121666);
+  var h8 = BigInt.from(f[8]) * BigInt.from(121666);
+  var h9 = BigInt.from(f[9]) * BigInt.from(121666);
+  var carry = List<BigInt>.filled(10, BigInt.zero);
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + BigInt.from(1 << 24)) >> 25;
+  h0 += carry[9] * BigInt.from(19);
   h9 -= carry[9] << 25;
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + BigInt.from(1 << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + BigInt.from(1 << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + BigInt.from(1 << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + BigInt.from(1 << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + BigInt.from(1 << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + BigInt.from(1 << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + BigInt.from(1 << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + BigInt.from(1 << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + BigInt.from(1 << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 
-  h[0] = h0;
-  h[1] = h1;
-  h[2] = h2;
-  h[3] = h3;
-  h[4] = h4;
-  h[5] = h5;
-  h[6] = h6;
-  h[7] = h7;
-  h[8] = h8;
-  h[9] = h9;
+  h[0] = h0.toInt();
+  h[1] = h1.toInt();
+  h[2] = h2.toInt();
+  h[3] = h3.toInt();
+  h[4] = h4.toInt();
+  h[5] = h5.toInt();
+  h[6] = h6.toInt();
+  h[7] = h7.toInt();
+  h[8] = h8.toInt();
+  h[9] = h9.toInt();
 }
 
 /// feInvert sets out = z^-1.
