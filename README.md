@@ -1,5 +1,8 @@
 Dart port of [Curve25519](https://github.com/golang/crypto/tree/master/curve25519)
 
+
+This branch of code represents a capability used by dart2js which is much slower than the [default implementation](https://github.com/Tougee/curve25519).
+
 Usage
 ```dart
 
