@@ -1,17 +1,19 @@
+import 'package:x25519/src/number/number.dart';
+
 class FieldElement {
-  late List<int> innerList;
+  late List<Number> innerList;
   FieldElement() {
-    innerList = List<int>.generate(10, (index) => 0);
+    innerList = List<Number>.generate(10, (index) => Number.zero);
   }
-  FieldElement.fromList(List<int> list) {
+  FieldElement.fromList(List<Number> list) {
     innerList = list;
   }
 
-  int operator [](int index) {
+  Number operator [](int index) {
     return innerList[index];
   }
 
-  void operator []=(int index, int value) {
+  void operator []=(int index, Number value) {
     innerList[index] = value;
   }
 
@@ -35,7 +37,7 @@ void FeZero(FieldElement fe) {
 
 void FeOne(FieldElement fe) {
   FeZero(fe);
-  fe[0] = 1;
+  fe[0] = Number.one;
 }
 
 void FeAdd(FieldElement dst, FieldElement a, FieldElement b) {
@@ -71,7 +73,7 @@ void FeCopy(FieldElement dst, FieldElement src) {
 // feCSwap replaces (f,g) with (g,f) if b == 1; replaces (f,g) with (f,g) if b == 0.
 //
 // Preconditions: b in {0,1}.
-void feCSwap(FieldElement f, FieldElement g, int b) {
+void feCSwap(FieldElement f, FieldElement g, Number b) {
   b = -b;
   for (var i = 0; i < f.length; i++) {
     var t = b & (f[i] ^ g[i]);
@@ -81,22 +83,22 @@ void feCSwap(FieldElement f, FieldElement g, int b) {
 }
 
 // load3 reads a 24-bit, little-endian value from in.
-int load3(List<int> input) {
+Number load3(List<int> input) {
   var r;
   r = input[0];
   r |= input[1] << 8;
   r |= input[2] << 16;
-  return r;
+  return Number(r);
 }
 
 // load4 reads a 32-bit, little-endian value from in.
-int load4(List<int> input) {
+Number load4(List<int> input) {
   int r;
   r = input[0];
   r |= input[1] << 8;
   r |= input[2] << 16;
   r |= input[3] << 24;
-  return r;
+  return Number(r);
 }
 
 void feFromBytes(FieldElement dst, List<int> src) {
@@ -109,38 +111,38 @@ void feFromBytes(FieldElement dst, List<int> src) {
   var h6 = load3(src.sublist(20, src.length)) << 7;
   var h7 = load3(src.sublist(23, src.length)) << 5;
   var h8 = load3(src.sublist(26, src.length)) << 4;
-  var h9 = (load3(src.sublist(29, src.length)) & 0x7fffff) << 2;
+  var h9 = (load3(src.sublist(29, src.length)) & Number.v0x7fffff) << 2;
 
-  var carry = List<int>.filled(10, 0);
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  var carry = List<Number>.filled(10, Number.zero);
+  carry[9] = (h9 + (Number.one << 24)) >> 25;
+  h0 += carry[9] * Number.v19;
   h9 -= carry[9] << 25;
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + (Number.one << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + (Number.one << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + (Number.one << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + (Number.one << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + (Number.one << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + (Number.one << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + (Number.one << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 
@@ -180,9 +182,9 @@ void feFromBytes(FieldElement dst, List<int> src) {
 ///   Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))
 ///   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
 void FeToBytes(List<int> s, FieldElement h) {
-  var carry = List<int>.filled(10, 0);
+  var carry = List<Number>.filled(10, Number.zero);
 
-  var q = (19 * h[9] + (1 << 24)) >> 25;
+  var q = (Number.v19 * h[9] + (Number.one << 24)) >> 25;
   q = (h[0] + q) >> 26;
   q = (h[1] + q) >> 25;
   q = (h[2] + q) >> 26;
@@ -195,7 +197,7 @@ void FeToBytes(List<int> s, FieldElement h) {
   q = (h[9] + q) >> 25;
 
   // Goal: Output h-(2^255-19)q, which is between 0 and 2^255-20.
-  h[0] += 19 * q;
+  h[0] += Number.v19 * q;
   // Goal: Output h-2^255 q, which is between 0 and 2^255-20.
 
   carry[0] = h[0] >> 26;
@@ -234,38 +236,38 @@ void FeToBytes(List<int> s, FieldElement h) {
   // evidently 2^255 h10-2^255 q = 0.
   // Goal: Output h[0]+...+2^230 h[9].
 
-  s[0] = h[0] >> 0;
-  s[1] = h[0] >> 8;
-  s[2] = h[0] >> 16;
-  s[3] = (h[0] >> 24) | (h[1] << 2);
-  s[4] = h[1] >> 6;
-  s[5] = h[1] >> 14;
-  s[6] = (h[1] >> 22) | (h[2] << 3);
-  s[7] = h[2] >> 5;
-  s[8] = h[2] >> 13;
-  s[9] = (h[2] >> 21) | (h[3] << 5);
-  s[10] = h[3] >> 3;
-  s[11] = h[3] >> 11;
-  s[12] = (h[3] >> 19) | (h[4] << 6);
-  s[13] = h[4] >> 2;
-  s[14] = h[4] >> 10;
-  s[15] = h[4] >> 18;
-  s[16] = h[5] >> 0;
-  s[17] = h[5] >> 8;
-  s[18] = h[5] >> 16;
-  s[19] = (h[5] >> 24) | (h[6] << 1);
-  s[20] = h[6] >> 7;
-  s[21] = h[6] >> 15;
-  s[22] = (h[6] >> 23) | (h[7] << 3);
-  s[23] = h[7] >> 5;
-  s[24] = h[7] >> 13;
-  s[25] = (h[7] >> 21) | (h[8] << 4);
-  s[26] = h[8] >> 4;
-  s[27] = h[8] >> 12;
-  s[28] = (h[8] >> 20) | (h[9] << 6);
-  s[29] = h[9] >> 2;
-  s[30] = h[9] >> 10;
-  s[31] = h[9] >> 18;
+  s[0] = (h[0] >> 0).intValue;
+  s[1] = (h[0] >> 8).intValue;
+  s[2] = (h[0] >> 16).intValue;
+  s[3] = ((h[0] >> 24) | (h[1] << 2)).intValue;
+  s[4] = (h[1] >> 6).intValue;
+  s[5] = (h[1] >> 14).intValue;
+  s[6] = ((h[1] >> 22) | (h[2] << 3)).intValue;
+  s[7] = (h[2] >> 5).intValue;
+  s[8] = (h[2] >> 13).intValue;
+  s[9] = ((h[2] >> 21) | (h[3] << 5)).intValue;
+  s[10] = (h[3] >> 3).intValue;
+  s[11] = (h[3] >> 11).intValue;
+  s[12] = ((h[3] >> 19) | (h[4] << 6)).intValue;
+  s[13] = (h[4] >> 2).intValue;
+  s[14] = (h[4] >> 10).intValue;
+  s[15] = (h[4] >> 18).intValue;
+  s[16] = (h[5] >> 0).intValue;
+  s[17] = (h[5] >> 8).intValue;
+  s[18] = (h[5] >> 16).intValue;
+  s[19] = ((h[5] >> 24) | (h[6] << 1)).intValue;
+  s[20] = (h[6] >> 7).intValue;
+  s[21] = (h[6] >> 15).intValue;
+  s[22] = ((h[6] >> 23) | (h[7] << 3)).intValue;
+  s[23] = (h[7] >> 5).intValue;
+  s[24] = (h[7] >> 13).intValue;
+  s[25] = ((h[7] >> 21) | (h[8] << 4)).intValue;
+  s[26] = (h[8] >> 4).intValue;
+  s[27] = (h[8] >> 12).intValue;
+  s[28] = ((h[8] >> 20) | (h[9] << 6)).intValue;
+  s[29] = (h[9] >> 2).intValue;
+  s[30] = (h[9] >> 10).intValue;
+  s[31] = (h[9] >> 18).intValue;
 }
 
 /// feMul calculates h = f * g
@@ -316,20 +318,20 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
   var g7 = g[7];
   var g8 = g[8];
   var g9 = g[9];
-  var g1_19 = 19 * g[1]; /* 1.4*2^29 */
-  var g2_19 = 19 * g[2]; /* 1.4*2^30; still ok */
-  var g3_19 = 19 * g[3];
-  var g4_19 = 19 * g[4];
-  var g5_19 = 19 * g[5];
-  var g6_19 = 19 * g[6];
-  var g7_19 = 19 * g[7];
-  var g8_19 = 19 * g[8];
-  var g9_19 = 19 * g[9];
-  var f1_2 = 2 * f[1];
-  var f3_2 = 2 * f[3];
-  var f5_2 = 2 * f[5];
-  var f7_2 = 2 * f[7];
-  var f9_2 = 2 * f[9];
+  var g1_19 = Number.v19 * g[1]; /* 1.4*2^29 */
+  var g2_19 = Number.v19 * g[2]; /* 1.4*2^30; still ok */
+  var g3_19 = Number.v19 * g[3];
+  var g4_19 = Number.v19 * g[4];
+  var g5_19 = Number.v19 * g[5];
+  var g6_19 = Number.v19 * g[6];
+  var g7_19 = Number.v19 * g[7];
+  var g8_19 = Number.v19 * g[8];
+  var g9_19 = Number.v19 * g[9];
+  var f1_2 = Number.two * f[1];
+  var f3_2 = Number.two * f[3];
+  var f5_2 = Number.two * f[5];
+  var f7_2 = Number.two * f[7];
+  var f9_2 = Number.two * f[9];
   var f0g0 = f0 * g0;
   var f0g1 = f0 * g1;
   var f0g2 = f0 * g2;
@@ -514,17 +516,17 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
       f9g9_38;
   var h9 = f0g9 + f1g8 + f2g7 + f3g6 + f4g5 + f5g4 + f6g3 + f7g2 + f8g1 + f9g0;
 
-  var carry = List<int>.filled(10, 0);
+  var carry = List<Number>.filled(10, Number.zero);
 
 // |h0| <= (1.1*1.1*2^52*(1+19+19+19+19)+1.1*1.1*2^50*(38+38+38+38+38))
 //   i.e. |h0| <= 1.2*2^59; narrower ranges for h2, h4, h6, h8
 // |h1| <= (1.1*1.1*2^51*(1+1+19+19+19+19+19+19+19+19))
 //   i.e. |h1| <= 1.5*2^58; narrower ranges for h3, h5, h7, h9
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
 // |h0| <= 2^25
@@ -532,10 +534,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h1| <= 1.51*2^58
 // |h5| <= 1.51*2^58
 
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + (Number.one << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + (Number.one << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
 // |h1| <= 2^24; from now on fits into int32
@@ -543,10 +545,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h2| <= 1.21*2^59
 // |h6| <= 1.21*2^59
 
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + (Number.one << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + (Number.one << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
 // |h2| <= 2^25; from now on fits into int32 unchanged
@@ -554,10 +556,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h3| <= 1.51*2^58
 // |h7| <= 1.51*2^58
 
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + (Number.one << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + (Number.one << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 // |h3| <= 2^24; from now on fits into int32 unchanged
@@ -565,10 +567,10 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h4| <= 1.52*2^33
 // |h8| <= 1.52*2^33
 
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + (Number.one << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 // |h4| <= 2^25; from now on fits into int32 unchanged
@@ -576,13 +578,13 @@ void feMul(FieldElement h, FieldElement f, FieldElement g) {
 // |h5| <= 1.01*2^24
 // |h9| <= 1.51*2^58
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + (Number.one << 24)) >> 25;
+  h0 += carry[9] * Number.v19;
   h9 -= carry[9] << 25;
 // |h9| <= 2^24; from now on fits into int32 unchanged
 // |h0| <= 1.8*2^37
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
 // |h0| <= 2^25; from now on fits into int32 unchanged
@@ -618,19 +620,19 @@ void feSquare(FieldElement h, FieldElement f) {
   var f7 = f[7];
   var f8 = f[8];
   var f9 = f[9];
-  var f0_2 = 2 * f0;
-  var f1_2 = 2 * f1;
-  var f2_2 = 2 * f2;
-  var f3_2 = 2 * f3;
-  var f4_2 = 2 * f4;
-  var f5_2 = 2 * f5;
-  var f6_2 = 2 * f6;
-  var f7_2 = 2 * f7;
-  var f5_38 = 38 * f5; // 1.31*2^30
-  var f6_19 = 19 * f6; // 1.31*2^30
-  var f7_38 = 38 * f7; // 1.31*2^30
-  var f8_19 = 19 * f8; // 1.31*2^30
-  var f9_38 = 38 * f9; // 1.31*2^30
+  var f0_2 = Number.two * f0;
+  var f1_2 = Number.two * f1;
+  var f2_2 = Number.two * f2;
+  var f3_2 = Number.two * f3;
+  var f4_2 = Number.two * f4;
+  var f5_2 = Number.two * f5;
+  var f6_2 = Number.two * f6;
+  var f7_2 = Number.two * f7;
+  var f5_38 = Number.v38 * f5; // 1.31*2^30
+  var f6_19 = Number.v19 * f6; // 1.31*2^30
+  var f7_38 = Number.v38 * f7; // 1.31*2^30
+  var f8_19 = Number.v19 * f8; // 1.31*2^30
+  var f9_38 = Number.v38 * f9; // 1.31*2^30
   var f0f0 = f0 * f0;
   var f0f1_2 = f0_2 * f1;
   var f0f2_2 = f0_2 * f2;
@@ -696,48 +698,48 @@ void feSquare(FieldElement h, FieldElement f) {
   var h7 = f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38;
   var h8 = f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38;
   var h9 = f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2;
-  var carry = List<int>.filled(10, 0);
+  var carry = List<Number>.filled(10, Number.zero);
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
 
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + (Number.one << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + (Number.one << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
 
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + (Number.one << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + (Number.one << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
 
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + (Number.one << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + (Number.one << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + (Number.one << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + (Number.one << 24)) >> 25;
+  h0 += carry[9] * Number.v19;
   h9 -= carry[9] << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
 
@@ -761,47 +763,47 @@ void feSquare(FieldElement h, FieldElement f) {
 /// Postconditions:
 ///    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 void feMul121666(FieldElement h, FieldElement f) {
-  var h0 = f[0] * 121666;
-  var h1 = f[1] * 121666;
-  var h2 = f[2] * 121666;
-  var h3 = f[3] * 121666;
-  var h4 = f[4] * 121666;
-  var h5 = f[5] * 121666;
-  var h6 = f[6] * 121666;
-  var h7 = f[7] * 121666;
-  var h8 = f[8] * 121666;
-  var h9 = f[9] * 121666;
-  var carry = List<int>.filled(10, 0);
+  var h0 = f[0] * Number.v121666;
+  var h1 = f[1] * Number.v121666;
+  var h2 = f[2] * Number.v121666;
+  var h3 = f[3] * Number.v121666;
+  var h4 = f[4] * Number.v121666;
+  var h5 = f[5] * Number.v121666;
+  var h6 = f[6] * Number.v121666;
+  var h7 = f[7] * Number.v121666;
+  var h8 = f[8] * Number.v121666;
+  var h9 = f[9] * Number.v121666;
+  var carry = List<Number>.filled(10, Number.zero);
 
-  carry[9] = (h9 + (1 << 24)) >> 25;
-  h0 += carry[9] * 19;
+  carry[9] = (h9 + (Number.one << 24)) >> 25;
+  h0 += carry[9] * Number.v19;
   h9 -= carry[9] << 25;
-  carry[1] = (h1 + (1 << 24)) >> 25;
+  carry[1] = (h1 + (Number.one << 24)) >> 25;
   h2 += carry[1];
   h1 -= carry[1] << 25;
-  carry[3] = (h3 + (1 << 24)) >> 25;
+  carry[3] = (h3 + (Number.one << 24)) >> 25;
   h4 += carry[3];
   h3 -= carry[3] << 25;
-  carry[5] = (h5 + (1 << 24)) >> 25;
+  carry[5] = (h5 + (Number.one << 24)) >> 25;
   h6 += carry[5];
   h5 -= carry[5] << 25;
-  carry[7] = (h7 + (1 << 24)) >> 25;
+  carry[7] = (h7 + (Number.one << 24)) >> 25;
   h8 += carry[7];
   h7 -= carry[7] << 25;
 
-  carry[0] = (h0 + (1 << 25)) >> 26;
+  carry[0] = (h0 + (Number.one << 25)) >> 26;
   h1 += carry[0];
   h0 -= carry[0] << 26;
-  carry[2] = (h2 + (1 << 25)) >> 26;
+  carry[2] = (h2 + (Number.one << 25)) >> 26;
   h3 += carry[2];
   h2 -= carry[2] << 26;
-  carry[4] = (h4 + (1 << 25)) >> 26;
+  carry[4] = (h4 + (Number.one << 25)) >> 26;
   h5 += carry[4];
   h4 -= carry[4] << 26;
-  carry[6] = (h6 + (1 << 25)) >> 26;
+  carry[6] = (h6 + (Number.one << 25)) >> 26;
   h7 += carry[6];
   h6 -= carry[6] << 26;
-  carry[8] = (h8 + (1 << 25)) >> 26;
+  carry[8] = (h8 + (Number.one << 25)) >> 26;
   h9 += carry[8];
   h8 -= carry[8] << 26;
 
@@ -883,12 +885,12 @@ void feInvert(FieldElement out, FieldElement z) {
 }
 
 void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
-  var e = List<int>.filled(32, 0);
+  var e = List<Number>.filled(32, Number.zero);
 
-  e.setRange(0, e.length, input);
-  e[0] &= 248;
-  e[31] &= 127;
-  e[31] |= 64;
+  e.setRange(0, e.length, input.map((e) => Number(e)).toList());
+  e[0] &= Number.v248;
+  e[31] &= Number.v127;
+  e[31] |= Number.v64;
 
   var x1 = FieldElement();
   var x2 = FieldElement();
@@ -903,10 +905,10 @@ void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
   FeCopy(x3, x1);
   FeOne(z3);
 
-  var swap = 0;
+  var swap = Number.zero;
   for (var pos = 254; pos >= 0; pos--) {
     var b = e[pos ~/ 8] >> (pos & 7);
-    b &= 1;
+    b &= Number.one;
     swap ^= b;
     feCSwap(x2, x3, swap);
     feCSwap(z2, z3, swap);
