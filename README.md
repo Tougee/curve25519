@@ -29,5 +29,3 @@ void useX25519() {
   assert(HEX.encode(x) == expectedHex);
 }
 ```
-
-For **dart2js** or **Flutter web** usage, check [here](https://github.com/Tougee/curve25519/tree/feature/bigint).
