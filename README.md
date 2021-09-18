@@ -1,8 +1,10 @@
+# Curve25519
+
 Dart port of [Curve25519](https://github.com/golang/crypto/tree/master/curve25519)
 
 [Pub package](https://pub.dev/packages/x25519)
 
-Usage
+## Usage
 ```dart
 
 import 'package:x25519/x25519.dart';
@@ -29,3 +31,38 @@ void useX25519() {
   assert(HEX.encode(x) == expectedHex);
 }
 ```
+
+## Benchmark
+
+Simulate from [pinenacl-dart Benchmark](https://github.com/ilap/pinenacl-dart/blob/master/benchmark/README.md)
+
+MacBook Pro (16-inch, 2019), macOS Big Sur, with 2.4GHz i9 32GB
+
+#### JiT (Dart VM) Benchmark
+
+> $ pub get  
+> $ pub run benchmark/curve25519_benchmark.dart
+
+| type |    rate    | iterations    |   time  | data throughput |
+|----------|:----------:|---------------|:-------:|:---------------:|
+| X25519 | 357.08 MB/s | 1786 iterations | 5001 ms | 1.74 GB |
+
+#### AoT (native binary)
+
+> $ pub get  
+> $ dart2native benchmark/curve25519_benchmark.dart -o curve25519_benchmark  
+> $ ./curve25519_benchmark
+
+| type |    rate    | iterations    |   time  | data throughput |
+|----------|:----------:|---------------|:-------:|:---------------:|
+| X25519 | 521.88 MB/s | 2610 iterations | 5001 ms | 2.55 GB |
+
+
+#### JS (Dart2JS) benchmark
+
+> $ pub get  
+> $ pub run benchmark/curve25519_benchmark.dart -p chrome
+
+| type |    rate    | iterations    |   time  | data throughput |
+|----------|:----------:|---------------|:-------:|:---------------:|
+| X25519 | 362.38 MB/s | 1812 iterations | 5000 ms | 1.77 GB |

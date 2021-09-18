@@ -1,4 +1,3 @@
-
 import 'package:adaptive_number/adaptive_number.dart';
 import 'package:x25519/src/numbers.dart';
 

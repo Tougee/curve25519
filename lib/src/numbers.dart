@@ -8,5 +8,4 @@ abstract class Numbers {
   static Number v248 = Number(248);
   static Number v121666 = Number(121666);
   static Number v0x7fffff = Number(0x7fffff);
-
 }
