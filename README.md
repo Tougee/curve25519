@@ -40,29 +40,29 @@ MacBook Pro (16-inch, 2019), macOS Big Sur, with 2.4GHz i9 32GB
 
 #### JiT (Dart VM) Benchmark
 
-> $ pub get  
-> $ pub run benchmark/curve25519_benchmark.dart
+> dart test test/benchmark/curve25519_benchmark.dart
 
-| type |    rate    | iterations    |   time  | data throughput |
-|----------|:----------:|---------------|:-------:|:---------------:|
-| X25519 | 357.08 MB/s | 1786 iterations | 5001 ms | 1.74 GB |
+| type | iterations    |   time  |
+|:----------:|:----------:|---------------|
+| generateKeyPair | 1259 iterations | 5001 ms
+| X25519 | 1745 iterations | 5001 ms
 
 #### AoT (native binary)
 
-> $ pub get  
-> $ dart2native benchmark/curve25519_benchmark.dart -o curve25519_benchmark  
-> $ ./curve25519_benchmark
+> dart2native test/benchmark/curve25519_benchmark.dart -o curve25519_benchmark  
+> ./curve25519_benchmark
 
-| type |    rate    | iterations    |   time  | data throughput |
-|----------|:----------:|---------------|:-------:|:---------------:|
-| X25519 | 521.88 MB/s | 2610 iterations | 5001 ms | 2.55 GB |
+| type | iterations    |   time  |
+|:----------:|---------------|:-------:|
+| generateKeyPair | 1751 iterations | 5002 ms
+| X25519 | 2266 iterations | 5000 ms
 
 
 #### JS (Dart2JS) benchmark
 
-> $ pub get  
-> $ pub run benchmark/curve25519_benchmark.dart -p chrome
+> dart test test/benchmark/curve25519_benchmark.dart -p chrome
 
-| type |    rate    | iterations    |   time  | data throughput |
-|----------|:----------:|---------------|:-------:|:---------------:|
-| X25519 | 362.38 MB/s | 1812 iterations | 5000 ms | 1.77 GB |
+| type | iterations    |   time  |
+|:----------:|:---------------|:-------:|
+| generateKeyPair | 242 iterations | 5022 ms
+| X25519 | 244 iterations | 5013 ms
