@@ -54,6 +54,8 @@ KeyPair generateKeyPair() {
 /// Deprecated: when provided a low-order point, ScalarMult will set dst to all
 /// zeroes, irrespective of the scalar. Instead, use the X25519 function, which
 /// will return an error.
+// Retain the published Go-style API for backwards compatibility.
+// ignore: non_constant_identifier_names
 void ScalarMult(List<int> dst, List<int> scalar, List<int> point) {
   curve.scalarMultGeneric(dst, scalar, point);
 }
@@ -63,6 +65,8 @@ void ScalarMult(List<int> dst, List<int> scalar, List<int> point) {
 ///
 /// It is recommended to use the X25519 function with Basepoint instead, as
 /// copying into fixed size arrays can lead to unexpected bugs.
+// Retain the published Go-style API for backwards compatibility.
+// ignore: non_constant_identifier_names
 void ScalarBaseMult(List<int> dst, List<int> scalar) {
   curve.scalarMultGeneric(dst, scalar, basePoint);
 }
@@ -148,6 +152,8 @@ void checkBasepoint() {
 ///
 /// If point is Basepoint (but not if it's a different slice with the same
 /// contents) a precomputed implementation might be used for performance.
+// Retain the published Go-style API for backwards compatibility.
+// ignore: non_constant_identifier_names
 Uint8List X25519(List<int> scalar, List<int> point) {
   /// Outline the body of function, to let the allocation be inlined in the
   /// caller, and possibly avoid escaping to the heap.

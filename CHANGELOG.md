@@ -1,3 +1,10 @@
+## 0.1.2
+
+- Fix all pub.dev static-analysis scoring issues while preserving the existing
+  public API.
+- Replace the discontinued `pedantic` package with the official `lints`
+  package.
+
 ### 0.1.1
 Moved Number classes to dedicated library in [#3](https://github.com/Tougee/curve25519/pull/3) and we got a new dependencies `adaptive_number`
 

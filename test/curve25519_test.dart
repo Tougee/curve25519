@@ -5,7 +5,7 @@ import 'package:x25519/x25519.dart';
 import 'package:test/test.dart';
 import 'package:hex/hex.dart';
 
-import 'vectors_test.dart';
+import 'vectors.dart';
 
 const expectedHex =
     '89161fde887b2b53de549af483940106ecc114d6982daa98256de23bdf77661a';

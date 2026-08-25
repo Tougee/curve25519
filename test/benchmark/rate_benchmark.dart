@@ -10,9 +10,6 @@ abstract class RateBenchmark extends BenchmarkBase {
   int _iterations = 0;
 
   @override
-  ScoreEmitter get emitter => super.emitter;
-
-  @override
   void exercise() {
     _iterations = 0;
 

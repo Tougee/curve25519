@@ -32,16 +32,16 @@ void fieldElementFullCopy(FieldElement src, FieldElement dest) {
 
 var zero = FieldElement();
 
-void FeZero(FieldElement fe) {
+void feZero(FieldElement fe) {
   fieldElementFullCopy(zero, fe);
 }
 
-void FeOne(FieldElement fe) {
-  FeZero(fe);
+void feOne(FieldElement fe) {
+  feZero(fe);
   fe[0] = Number.one;
 }
 
-void FeAdd(FieldElement dst, FieldElement a, FieldElement b) {
+void feAdd(FieldElement dst, FieldElement a, FieldElement b) {
   dst[0] = a[0] + b[0];
   dst[1] = a[1] + b[1];
   dst[2] = a[2] + b[2];
@@ -54,7 +54,7 @@ void FeAdd(FieldElement dst, FieldElement a, FieldElement b) {
   dst[9] = a[9] + b[9];
 }
 
-void FeSub(FieldElement dst, FieldElement a, FieldElement b) {
+void feSub(FieldElement dst, FieldElement a, FieldElement b) {
   dst[0] = a[0] - b[0];
   dst[1] = a[1] - b[1];
   dst[2] = a[2] - b[2];
@@ -67,7 +67,7 @@ void FeSub(FieldElement dst, FieldElement a, FieldElement b) {
   dst[9] = a[9] - b[9];
 }
 
-void FeCopy(FieldElement dst, FieldElement src) {
+void feCopy(FieldElement dst, FieldElement src) {
   fieldElementFullCopy(src, dst);
 }
 
@@ -85,8 +85,7 @@ void feCSwap(FieldElement f, FieldElement g, Number b) {
 
 // load3 reads a 24-bit, little-endian value from in.
 Number load3(List<int> input) {
-  var r;
-  r = input[0];
+  var r = input[0];
   r |= input[1] << 8;
   r |= input[2] << 16;
   return Number(r);
@@ -159,7 +158,7 @@ void feFromBytes(FieldElement dst, List<int> src) {
   dst[9] = h9;
 }
 
-/// FeToBytes marshals h to s.
+/// feToBytes marshals h to s.
 /// Preconditions:
 ///   |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 ///
@@ -182,7 +181,7 @@ void feFromBytes(FieldElement dst, List<int> src) {
 ///
 ///   Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))
 ///   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
-void FeToBytes(List<int> s, FieldElement h) {
+void feToBytes(List<int> s, FieldElement h) {
   var carry = List<Number>.filled(10, Number.zero);
 
   var q = (Numbers.v19 * h[9] + (Number.one << 24)) >> 25;
@@ -902,9 +901,9 @@ void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
   var tmp1 = FieldElement();
 
   feFromBytes(x1, base);
-  FeOne(x2);
-  FeCopy(x3, x1);
-  FeOne(z3);
+  feOne(x2);
+  feCopy(x3, x1);
+  feOne(z3);
 
   var swap = Number.zero;
   for (var pos = 254; pos >= 0; pos--) {
@@ -915,22 +914,22 @@ void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
     feCSwap(z2, z3, swap);
     swap = b;
 
-    FeSub(tmp0, x3, z3);
-    FeSub(tmp1, x2, z2);
-    FeAdd(x2, x2, z2);
-    FeAdd(z2, x3, z3);
+    feSub(tmp0, x3, z3);
+    feSub(tmp1, x2, z2);
+    feAdd(x2, x2, z2);
+    feAdd(z2, x3, z3);
     feMul(z3, tmp0, x2);
     feMul(z2, z2, tmp1);
     feSquare(tmp0, tmp1);
     feSquare(tmp1, x2);
-    FeAdd(x3, z3, z2);
-    FeSub(z2, z3, z2);
+    feAdd(x3, z3, z2);
+    feSub(z2, z3, z2);
     feMul(x2, tmp1, tmp0);
-    FeSub(tmp1, tmp1, tmp0);
+    feSub(tmp1, tmp1, tmp0);
     feSquare(z2, z2);
     feMul121666(z3, tmp1);
     feSquare(x3, x3);
-    FeAdd(tmp0, tmp0, z3);
+    feAdd(tmp0, tmp0, z3);
     feMul(z3, x1, z2);
     feMul(z2, tmp1, tmp0);
   }
@@ -940,5 +939,5 @@ void scalarMultGeneric(List<int> out, List<int> input, List<int> base) {
 
   feInvert(z2, z2);
   feMul(x2, x2, z2);
-  FeToBytes(out, x2);
+  feToBytes(out, x2);
 }
